@@ -1,0 +1,39 @@
+@{
+    var anonymous = ViewData["Anonymous"] as bool? ?? false;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - DevOnBoarding</title>
+    <link rel="stylesheet" href="~/lib/kogrid/KoGrid.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body data-anonymous="@(anonymous ? "true" : "false")">
+    <header class="topbar" id="app-header">
+        <a class="brand" href="/Users"><span class="brand-mark" aria-hidden="true"></span>DevOnBoarding</a>
+        @if (!anonymous)
+        {
+            <nav class="topnav" aria-label="Main">
+                <a href="/Users">Users</a>
+            </nav>
+            <div class="whoami" data-bind="visible: isAuthenticated" style="display:none">
+                <span class="whoami-name" data-bind="text: userName"></span>
+                <span class="chip chip--role" data-bind="text: role, visible: role"></span>
+                <button type="button" class="btn btn--ghost" data-bind="click: logout">Sign out</button>
+            </div>
+        }
+    </header>
+
+    <main class="container">
+        @RenderBody()
+    </main>
+
+    @* 1) конфіг RequireJS (глобальний об'єкт require), 2) сам require.js, 3) модулі сторінки *@
+    <script src="~/js/require.config.js" asp-append-version="true"></script>
+    <script src="~/lib/requirejs/require.js"></script>
+    <script>require(['app/layout']);</script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

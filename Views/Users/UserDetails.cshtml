@@ -1,0 +1,102 @@
+@{
+    ViewData["Title"] = "User details";
+}
+
+<section id="user-details-page" class="page page--narrow" aria-labelledby="details-title">
+    <header class="page-head">
+        <a class="back" href="/Users">Back to users</a>
+        <h1 id="details-title" data-bind="text: title">User</h1>
+    </header>
+
+    <div class="alert alert--error" role="alert" style="display:none"
+         data-bind="visible: error, text: error"></div>
+    <p class="status-line" role="status" style="display:none" data-bind="visible: loading">Loading user…</p>
+
+    <!-- VIEW MODE -->
+    <div class="panel" style="display:none" data-bind="visible: isView() && !loading()">
+        <dl class="facts">
+            <dt>User name</dt><dd data-bind="text: model.userName"></dd>
+            <dt>Email</dt><dd data-bind="text: model.email"></dd>
+            <dt>Status</dt>
+            <dd><span class="chip" data-bind="css: { 'chip--on': model.activeStatus, 'chip--off': !model.activeStatus() }, text: model.activeStatus() ? 'Active' : 'Inactive'"></span></dd>
+            <dt>Role</dt><dd data-bind="text: roleName"></dd>
+            <dt>First name</dt><dd data-bind="text: model.firstName"></dd>
+            <dt>Second name</dt><dd data-bind="text: model.secondName() || '—'"></dd>
+            <dt>Birth date</dt><dd data-bind="text: birthDateText() || '—'"></dd>
+        </dl>
+        <div class="actions">
+            <!-- ko if: isAdmin -->
+            <button type="button" class="btn btn--primary" data-bind="click: goEdit">Edit user</button>
+            <button type="button" class="btn btn--danger" data-bind="click: remove, disable: saving">Delete user</button>
+            <!-- /ko -->
+        </div>
+    </div>
+
+    <!-- ADD / EDIT MODE -->
+    <form class="panel form" novalidate style="display:none"
+          data-bind="visible: !isView() && !loading(), submit: save">
+        <div class="alert alert--error" role="alert" style="display:none"
+             data-bind="visible: errors().length">
+            Fix the highlighted fields and try again.
+        </div>
+
+        <div class="grid2">
+            <label class="field" data-bind="css: { 'field--invalid': errorFor('userName') }">
+                <span class="field-label">User name</span>
+                <input type="text" maxlength="50" autocomplete="off" data-bind="textInput: model.userName" />
+                <span class="field-error" data-bind="text: errorFor('userName')"></span>
+            </label>
+
+            <label class="field" data-bind="css: { 'field--invalid': errorFor('email') }">
+                <span class="field-label">Email</span>
+                <input type="email" maxlength="50" autocomplete="off" data-bind="textInput: model.email" />
+                <span class="field-error" data-bind="text: errorFor('email')"></span>
+            </label>
+
+            <label class="field" data-bind="css: { 'field--invalid': errorFor('password') }">
+                <span class="field-label">Password</span>
+                <input type="password" maxlength="50" autocomplete="new-password" data-bind="textInput: model.password" />
+                <span class="field-hint" data-bind="visible: isEdit">Leave empty to keep the current password.</span>
+                <span class="field-error" data-bind="text: errorFor('password')"></span>
+            </label>
+
+            <label class="field" data-bind="css: { 'field--invalid': errorFor('roleTypePK') }">
+                <span class="field-label">Role</span>
+                <select data-bind="options: roles, optionsText: 'name', optionsValue: 'id', value: model.roleTypePK, optionsCaption: 'Choose a role'"></select>
+                <span class="field-error" data-bind="text: errorFor('roleTypePK')"></span>
+            </label>
+
+            <label class="field" data-bind="css: { 'field--invalid': errorFor('firstName') }">
+                <span class="field-label">First name</span>
+                <input type="text" maxlength="50" data-bind="textInput: model.firstName" />
+                <span class="field-error" data-bind="text: errorFor('firstName')"></span>
+            </label>
+
+            <label class="field" data-bind="css: { 'field--invalid': errorFor('secondName') }">
+                <span class="field-label">Second name (optional)</span>
+                <input type="text" maxlength="50" data-bind="textInput: model.secondName" />
+                <span class="field-error" data-bind="text: errorFor('secondName')"></span>
+            </label>
+
+            <label class="field" data-bind="css: { 'field--invalid': errorFor('birthDate') }">
+                <span class="field-label">Birth date (optional)</span>
+                <input type="date" data-bind="value: model.birthDate" />
+                <span class="field-error" data-bind="text: errorFor('birthDate')"></span>
+            </label>
+
+            <label class="check check--box">
+                <input type="checkbox" data-bind="checked: model.activeStatus" /> Active user
+            </label>
+        </div>
+
+        <div class="actions">
+            <button type="submit" class="btn btn--primary" data-bind="disable: saving, text: isAdd() ? 'Create user' : 'Save changes'"></button>
+            <button type="button" class="btn" data-bind="click: cancel, disable: saving">Cancel</button>
+            <span class="status-line" style="display:none" data-bind="visible: saving">Saving…</span>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <script>require(['app/user_details']);</script>
+}
