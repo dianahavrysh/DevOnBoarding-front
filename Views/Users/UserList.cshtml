@@ -1,0 +1,54 @@
+@{
+    ViewData["Title"] = "Users";
+}
+
+<section id="user-list-page" class="page" aria-labelledby="users-title">
+    <header class="page-head">
+        <h1 id="users-title">Users</h1>
+        <p class="page-sub" data-bind="text: list.rangeText"></p>
+    </header>
+
+    <form class="panel search" data-bind="submit: list.search">
+        <div class="search-row">
+            <label class="field grow">
+                <span class="field-label">Search</span>
+                <input type="search" autocomplete="off" placeholder="Type a name or an email"
+                       data-bind="textInput: list.searchValue" />
+            </label>
+            <button type="submit" class="btn btn--primary">Search</button>
+            <button type="button" class="btn" data-bind="click: list.reset">Reset</button>
+        </div>
+        <div class="search-opts"> 
+            <fieldset>
+                <legend>Search in</legend>
+                <!-- ko foreach: list.searchFields -->
+                <label class="check"><input type="checkbox" data-bind="checked: checked" /> <span data-bind="text: label"></span></label>
+                <!-- /ko -->
+            </fieldset>
+            <label class="check"><input type="checkbox" data-bind="checked: list.strictMatch" /> Exact match</label>
+            <label class="check"><input type="checkbox" data-bind="checked: list.includeInactive" /> Include inactive users</label>
+        </div>
+    </form>
+
+    <div class="toolbar" role="toolbar" aria-label="User actions">
+        <!-- ko if: isAdmin -->
+        <button type="button" class="btn btn--primary" data-bind="click: addUser">Add user</button>
+        <!-- /ko -->
+        <button type="button" class="btn" data-bind="click: viewSelected, enable: hasSelection">View</button>
+        <!-- ko if: isAdmin -->
+        <button type="button" class="btn" data-bind="click: editSelected, enable: hasSelection">Edit</button>
+        <button type="button" class="btn btn--danger" data-bind="click: deleteSelected, enable: hasSelection">Delete</button>
+        <!-- /ko -->
+        <span class="status-line" role="status" data-bind="visible: list.loading">Loading users…</span>
+    </div>
+
+    <div class="alert alert--error" role="alert" style="display:none"
+         data-bind="visible: list.error, text: list.error"></div>
+
+    <div id="userGrid" class="grid-host" data-bind="koGrid: list.gridOptions"></div>
+    <p class="hint">Select a row, then use the buttons above. Double-click a row to open it.</p>
+</section>
+
+@section Scripts {
+    <script>require(['app/user_list']);</script>
+}
