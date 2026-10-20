@@ -1,15 +1,3 @@
-/*
- * Загальна логіка серверного списку (koGrid + paging + sorting + search).
- * Сторінка передає лише параметри: звідки брати дані, колонки, поля пошуку.
- *
- * options:
- *   fetch(params) -> promise<{items, count}>   (обов'язково)
- *   mapItem(dto)  -> рядок для гріда
- *   columnDefs    -> колонки koGrid
- *   sort          -> { field, direction } початкове сортування (field = поле рядка гріда)
- *   sortFields    -> { gridField: 'ServerColumn' } для sortExpression
- *   searchFields  -> [{ key, param, label, checked }]
- */
 define(['jquery', 'knockout', 'koGrid'], function ($, ko) {
     'use strict';
 
@@ -31,7 +19,6 @@ define(['jquery', 'knockout', 'koGrid'], function ($, ko) {
             mapItem: function (x) { return x; }
         }, options);
 
-        // ----- state -----
         self.items = ko.observableArray([]);
         self.loading = ko.observable(false);
         self.error = ko.observable('');
@@ -67,7 +54,6 @@ define(['jquery', 'knockout', 'koGrid'], function ($, ko) {
             return 'Showing ' + from + '-' + Math.min(from + size - 1, total) + ' of ' + total;
         });
 
-        // ----- koGrid options (server-side paging + sorting) -----
         self.gridOptions = {
             data: self.items,
             columnDefs: o.columnDefs,
@@ -106,14 +92,14 @@ define(['jquery', 'knockout', 'koGrid'], function ($, ko) {
                 return;
             }
 
-            var ticket = ++seq;                       // відкидаємо застарілі відповіді
+            var ticket = ++seq;                       
             self.loading(true);
             self.error('');
 
             o.fetch(params).then(function (res) {
                 if (ticket !== seq) { return; }
                 var pages = Math.max(1, Math.ceil(res.count / size));
-                if (page > pages && res.count > 0) {  // напр. видалили останній запис на останній сторінці
+                if (page > pages && res.count > 0) {  
                     self.pagingOptions.currentPage(pages);
                     return;
                 }
@@ -130,7 +116,6 @@ define(['jquery', 'knockout', 'koGrid'], function ($, ko) {
             });
         };
 
-        // кілька змін підряд (сторінка + розмір + сортування) = один запит
         function scheduleReload() {
             clearTimeout(timer);
             timer = setTimeout(self.reload, 0);

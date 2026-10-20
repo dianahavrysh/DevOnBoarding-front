@@ -1,4 +1,3 @@
-/* Невеликі хелпери форматування. */
 define(['app/config'], function (cfg) {
     'use strict';
 
@@ -8,17 +7,14 @@ define(['app/config'], function (cfg) {
         return value === null || value === undefined ? '' : String(value).replace(/[&<>"']/g, function (c) { return ESC[c]; });
     }
 
-    /** "1990-05-01T00:00:00" -> "1990-05-01" (для <input type="date">) */
     function toDateInput(value) {
         return value ? String(value).slice(0, 10) : '';
     }
 
-    /** "1990-05-01" -> "1990-05-01T00:00:00" (для API) */
     function toApiDate(value) {
         return value ? value + 'T00:00:00' : null;
     }
 
-    /** "1990-05-01T..." -> "01.05.1990" */
     function displayDate(value) {
         if (!value) { return ''; }
         var p = String(value).slice(0, 10).split('-');

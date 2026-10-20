@@ -1,16 +1,3 @@
-/*
- * Загальна логіка сторінки деталей з трьома режимами: add / view / edit.
- * Конкретна сторінка передає модель, мапінг DTO, валідацію та виклики API.
- *
- * options:
- *   titles                       { add, view, edit }
- *   createModel() -> { observable... }
- *   fill(model, dto)             dto -> model    (dto === null: значення за замовчуванням)
- *   toDto(model, mode, id)       model -> dto
- *   validate(model, mode)        -> [{ field, message }]
- *   load(id), create(dto), update(id, dto), remove(id)  -> promises
- *   onSaved(mode, id, result), onCancel(mode, id), onRemoved()
- */
 define(['jquery', 'knockout'], function ($, ko) {
     'use strict';
 

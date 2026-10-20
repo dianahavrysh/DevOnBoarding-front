@@ -1,9 +1,6 @@
-/* Сторінка Users/UserList: ініціалізує загальний List і додає дії над користувачами. */
 define(['jquery', 'knockout', 'app/config', 'app/auth', 'app/api', 'app/format', 'app/list'],
 function ($, ko, cfg, auth, api, fmt, List) {
     'use strict';
-
-    // UserDTO -> рядок гріда. koGrid виводить комірки через html-binding, тому все екрануємо.
     function mapRow(dto) {
         var fullName = [dto.firstName, dto.secondName].filter(Boolean).join(' ');
         return {
@@ -13,7 +10,8 @@ function ($, ko, cfg, auth, api, fmt, List) {
             email: fmt.escapeHtml(dto.email),
             fullName: fmt.escapeHtml(fullName),
             birthDateText: fmt.displayDate(dto.birthDate),
-            roleText: fmt.escapeHtml(fmt.roleName(dto.roleTypePK)),
+            roleText: fmt.escapeHtml(dto.roleName ||
+                fmt.roleName(dto.rolePK !== undefined ? dto.rolePK : dto.roleTypePK)),
             statusHtml: dto.activeStatus
                 ? '<span class="chip chip--on">Active</span>'
                 : '<span class="chip chip--off">Inactive</span>'
@@ -27,7 +25,7 @@ function ($, ko, cfg, auth, api, fmt, List) {
         pageSize: cfg.paging.pageSize,
         searchFields: cfg.searchFields,
         sort: { field: 'userName', direction: 'asc' },
-        sortFields: {                    // поле гріда -> колонка для sortExpression
+        sortFields: {                    
             userName: 'UserName',
             email: 'Email',
             fullName: 'FirstName',
@@ -70,7 +68,6 @@ function ($, ko, cfg, auth, api, fmt, List) {
     $(function () {
         ko.applyBindings(vm, document.getElementById('user-list-page'));
 
-        // подвійний клік по рядку = відкрити (перший клік уже виділив рядок)
         $('#userGrid').on('dblclick', '.kgRow', function () { vm.viewSelected(); });
     });
 

@@ -1,4 +1,3 @@
-/* Робота з JWT: збереження, розбір claims, перевірка ролі. */
 define(['app/config'], function (cfg) {
     'use strict';
 

@@ -1,13 +1,14 @@
-/* Єдине місце з налаштуваннями фронтенду. Підлаштуйте під свій бекенд. */
 define(function () {
     'use strict';
+
+    var API = 'https://localhost:53537';
 
     return {
         tokenKey: 'devonboarding.token',
 
         api: {
-            login: '/api/auth/login',   // POST { userName, password } -> { token }
-            users: '/api/users'         // GET (page) / GET {id} / POST / PUT {id} / DELETE {id}
+            login: API + '/api/auth/login',   
+            users: API + '/api/users'         
         },
 
         urls: {
@@ -16,18 +17,16 @@ define(function () {
             userDetails: '/Users/Details'
         },
 
-        // значення claim-а ролі в JWT, які вважаються адміністратором
         adminRoles: ['Administrator', 'Admin'],
 
-        // RoleTypes (RoleTypePK -> назва). Змініть відповідно до даних у таблиці RoleTypes.
         roles: [
-            { id: 1, name: 'Administrator' },
-            { id: 2, name: 'User' }
+            { id: 3, name: 'Administrator' },
+            { id: 2, name: 'Manager' },
+            { id: 1, name: 'User' }
         ],
 
         paging: { pageSizes: [10, 20, 50], pageSize: 10 },
 
-        // searchBy<Field> параметри Users_SEL_ByPage
         searchFields: [
             { key: 'UserName',   param: 'searchByUserName',   label: 'User name',   checked: true },
             { key: 'Email',      param: 'searchByEmail',      label: 'Email',       checked: true },

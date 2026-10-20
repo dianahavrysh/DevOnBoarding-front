@@ -1,4 +1,3 @@
-/* Сторінка Users/UserDetails: режими add/view/edit + Sammy-роутинг (#/add, #/view/:id, #/edit/:id). */
 define(['jquery', 'knockout', 'sammy', 'app/config', 'app/auth', 'app/api', 'app/format', 'app/details'],
 function ($, ko, Sammy, cfg, auth, api, fmt, Details) {
     'use strict';
@@ -15,10 +14,11 @@ function ($, ko, Sammy, cfg, auth, api, fmt, Details) {
             email: ko.observable(''),
             password: ko.observable(''),
             activeStatus: ko.observable(true),
+            roleName: ko.observable(''),
             roleTypePK: ko.observable(undefined),
             firstName: ko.observable(''),
             secondName: ko.observable(''),
-            birthDate: ko.observable('')            // yyyy-MM-dd
+            birthDate: ko.observable('')            
         };
     }
 
@@ -26,9 +26,11 @@ function ($, ko, Sammy, cfg, auth, api, fmt, Details) {
         dto = dto || {};
         m.userName(dto.userName || '');
         m.email(dto.email || '');
-        m.password('');                              // пароль з сервера не приходить
+        m.password('');                              
         m.activeStatus(dto.activeStatus === undefined ? true : !!dto.activeStatus);
-        m.roleTypePK(dto.roleTypePK === undefined || dto.roleTypePK === null ? undefined : Number(dto.roleTypePK));
+        var rolePK = dto.rolePK !== undefined ? dto.rolePK : dto.roleTypePK;
+        m.roleTypePK(rolePK === undefined || rolePK === null ? undefined : Number(rolePK));
+        m.roleName(dto.roleName || '');
         m.firstName(dto.firstName || '');
         m.secondName(dto.secondName || '');
         m.birthDate(fmt.toDateInput(dto.birthDate));
@@ -42,10 +44,12 @@ function ($, ko, Sammy, cfg, auth, api, fmt, Details) {
             roleTypePK: Number(m.roleTypePK()),
             firstName: $.trim(m.firstName()),
             secondName: $.trim(m.secondName()) || null,
+            rolePK: Number(m.roleTypePK()),
+            roleTypePK: Number(m.roleTypePK()),
             birthDate: fmt.toApiDate(m.birthDate())
         };
-        if (m.password()) { dto.password = m.password(); }   // у режимі edit порожній пароль = не змінювати
-        if (mode === 'edit') { dto.userPK = Number(id); }
+        if (m.password()) { dto.password = m.password(); } 
+        if (mode === 'edit') { dto.userPK = id; }
         return dto;
     }
 
@@ -99,15 +103,17 @@ function ($, ko, Sammy, cfg, auth, api, fmt, Details) {
         onRemoved: goList
     });
 
-    // page-specific members
     details.isAdmin = isAdmin;
     details.roles = cfg.roles;
-    details.roleName = ko.pureComputed(function () { return fmt.roleName(details.model.roleTypePK()); });
+    details.roleName = ko.pureComputed(function () {
+        return details.model.roleName() || fmt.roleName(details.model.roleTypePK());
+    });
     details.birthDateText = ko.pureComputed(function () { return fmt.displayDate(details.model.birthDate()); });
     details.goEdit = function () { go('#/edit/' + details.id()); };
 
-    // ---- Sammy routing ----
-    function validId(id) { return /^\d+$/.test(id) ? id : null; }
+    function validId(id) {
+        return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id) ? id : null;
+    }
 
     var router = Sammy(function () {
         this.get('#/add', function () {

@@ -1,8 +1,3 @@
-/*
- * RequireJS configuration.
- * Підключається ДО require.js: глобальний об'єкт `require` вважається конфігом.
- * Усі сторонні бібліотеки мають бути прописані тут (bindings for required js files).
- */
 var require = {
     baseUrl: '/js',
     waitSeconds: 20,
@@ -13,7 +8,6 @@ var require = {
         sammy: '../lib/sammy/sammy'
     },
     shim: {
-        // koGrid - не AMD-модуль, йому потрібні глобальні ko / jQuery -> app/globals їх виставляє
         koGrid: { deps: ['app/globals'] }
     }
 };

@@ -1,7 +1,3 @@
-/*
- * Тонка обгортка над $.ajax: додає Bearer-токен, нормалізує помилки та відповіді.
- * Якщо формат ваших DTO відрізняється - міняти потрібно лише normalizePage / unwrapItem.
- */
 define(['jquery', 'app/config', 'app/auth'], function ($, cfg, auth) {
     'use strict';
 
@@ -9,7 +5,7 @@ define(['jquery', 'app/config', 'app/auth'], function ($, cfg, auth) {
         var body = xhr.responseJSON, details = [], message = '';
 
         if (body) {
-            if (body.errors && typeof body.errors === 'object') {          // ModelState / ProblemDetails
+            if (body.errors && typeof body.errors === 'object') {        
                 $.each(body.errors, function (_, v) { details = details.concat(v); });
             }
             message = body.message || body.detail || body.title || '';
@@ -19,6 +15,7 @@ define(['jquery', 'app/config', 'app/auth'], function ($, cfg, auth) {
         }
         if (!message) {
             message = xhr.status === 0 ? 'Server is unreachable. Check your connection.'
+                : xhr.status === 429 ? 'Too many attempts. Wait a minute and try again.'
                 : xhr.status === 403 ? 'You do not have permission to do this.'
                 : xhr.status === 404 ? 'Not found.'
                 : 'Request failed (' + xhr.status + ').';
@@ -53,17 +50,15 @@ define(['jquery', 'app/config', 'app/auth'], function ($, cfg, auth) {
         });
     }
 
-    /** ResultDTO -> { items: [], count: N } */
     function normalizePage(res) {
         res = res || {};
         var items = res.items || res.Items || [];
-        var count = [res.count, res.itemsCount, res.totalCount, res.total].filter(function (x) {
+        var count = [res.totalRows, res.count, res.itemsCount, res.totalCount, res.total].filter(function (x) {
             return x !== undefined && x !== null;
         })[0];
         return { items: items, count: count === undefined ? items.length : Number(count) };
     }
 
-    /** ResultDTO з одним Item або «голий» UserDTO -> UserDTO */
     function unwrapItem(res) {
         return (res && (res.item || res.Item)) || res;
     }
@@ -73,12 +68,12 @@ define(['jquery', 'app/config', 'app/auth'], function ($, cfg, auth) {
         page: function (params) { return request('GET', cfg.api.users, params).then(normalizePage); },
         get: function (id) { return request('GET', cfg.api.users + '/' + id).then(unwrapItem); },
         create: function (dto) { return request('POST', cfg.api.users, dto).then(unwrapItem); },
-        update: function (id, dto) { return request('PUT', cfg.api.users + '/' + id, dto).then(unwrapItem); },
+        update: function (id, dto) { return request('PUT', cfg.api.users, dto).then(unwrapItem); },
         remove: function (id) { return request('DELETE', cfg.api.users + '/' + id); }
     };
 
-    function login(userName, password) {
-        return request('POST', cfg.api.login, { userName: userName, password: password }).then(function (res) {
+    function login(email, password) {
+        return request('POST', cfg.api.login, { email: email, password: password }).then(function (res) {
             var token = res && (res.token || res.accessToken || res.access_token || res.jwt);
             if (!token) { return $.Deferred().reject({ status: 0, message: 'Server did not return a token.' }).promise(); }
             return token;

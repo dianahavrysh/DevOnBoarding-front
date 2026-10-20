@@ -1,4 +1,3 @@
-/* Спільний для всіх сторінок: захист від неавторизованого доступу + шапка (хто увійшов / вихід). */
 define(['jquery', 'knockout', 'app/config', 'app/auth'], function ($, ko, cfg, auth) {
     'use strict';
 

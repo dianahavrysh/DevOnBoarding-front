@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "front": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "Users",
+      "applicationUrl": "https://localhost:7002;http://localhost:5002",
+      "environmentVariables": { "ASPNETCORE_ENVIRONMENT": "Development" }
+    }
+  }
+}
