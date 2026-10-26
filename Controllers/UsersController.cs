@@ -6,7 +6,7 @@ namespace DevOnBoarding.Controllers
     public class UsersController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() => View("UserList");
+        public IActionResult UserList() => View("UserList");
 
         [HttpGet("Details")]
         public IActionResult Details() => View("UserDetails");

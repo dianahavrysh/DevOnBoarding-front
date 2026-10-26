@@ -21,9 +21,7 @@
         <div class="search-opts"> 
             <fieldset>
                 <legend>Search in</legend>
-                <!-- ko foreach: list.searchFields -->
                 <label class="check"><input type="checkbox" data-bind="checked: checked" /> <span data-bind="text: label"></span></label>
-                <!-- /ko -->
             </fieldset>
             <label class="check"><input type="checkbox" data-bind="checked: list.strictMatch" /> Exact match</label>
             <label class="check"><input type="checkbox" data-bind="checked: list.includeInactive" /> Include inactive users</label>
