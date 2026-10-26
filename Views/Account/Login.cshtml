@@ -1,0 +1,27 @@
+@{
+    ViewData["Title"] = "Sign in";
+    ViewData["Anonymous"] = true;
+}
+
+<section id="login-page" class="page page--tiny" aria-labelledby="login-title">
+    <h1 id="login-title">Sign in</h1>
+    <form class="panel form" novalidate data-bind="submit: signIn">
+        <div class="alert alert--error" role="alert" style="display:none" data-bind="visible: error, text: error"></div>
+        <label class="field">
+            <span class="field-label">Email</span>
+            <input type="email" autocomplete="username" data-bind="textInput: email" />
+        </label>
+        <label class="field">
+            <span class="field-label">Password</span>
+            <input type="password" autocomplete="current-password" data-bind="textInput: password" />
+        </label>
+        <div class="actions">
+            <button type="submit" class="btn btn--primary" data-bind="disable: busy">Sign in</button>
+            <span class="status-line" style="display:none" data-bind="visible: busy">Signing in…</span>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <script>require(['app/login']);</script>
+}

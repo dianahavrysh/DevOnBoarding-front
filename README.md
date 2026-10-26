@@ -1,7 +1,21 @@
 # DevOnBoarding - UI (Knockout + koGrid + RequireJS + Sammy)
 
-Фронтенд для ASP.NET Core проєкту `DevOnBoarding` (Empty template). Скопіюйте вміст цієї папки в корінь проєкту
-(файли `Controllers`, `Views`, `wwwroot` додаються до існуючих), а в `Program.cs` додайте рядки з `Program.cs.example`.
+Фронтенд для ASP.NET Core проєкту `DevOnBoarding` (Empty template). Це окремий проєкт (`DevOnBoarding-front.csproj`), який працює на власному порту й ходить в API по HTTP.
+
+## Запуск
+1. Бекенд: додайте CORS (див. нижче) і запустіть `dotnet run`; запам'ятайте його URL.
+2. Впишіть цей URL у `wwwroot/js/app/config.js` (`API`).
+3. Фронт: `dotnet run` у цій папці, відкрийте https://localhost:7002.
+
+CORS у `Program.cs` бекенду:
+```csharp
+builder.Services.AddCors(o => o.AddPolicy("front", p => p
+    .WithOrigins("https://localhost:7002", "http://localhost:5002")
+    .AllowAnyHeader().AllowAnyMethod()));
+// ...
+app.UseRouting();
+app.UseCors("front");        // після UseRouting, ДО UseAuthentication/UseAuthorization/UseRateLimiter
+```
 
 ## Структура
 
@@ -33,21 +47,20 @@ wwwroot/
     user_details.js          модель користувача, валідація, Sammy-роути
 ```
 
-## Контракт з бекендом (змінюється в `config.js` / `api.js`)
+## Контракт з бекендом (збігається з UsersController / AuthController)
 
 | Дія | Запит | Відповідь |
 |---|---|---|
-| Вхід | `POST /api/auth/login` `{userName, password}` | `{token}` (JWT з role claim) |
-| Список | `GET /api/users?currentPage&pageSize&sortExpression&searchValue&searchByUserName&searchByEmail&searchByFirstName&searchBySecondName&includeInactive&strictMatch` | `ResultDTO`: `{items:[UserDTO], count}` |
-| Один | `GET /api/users/{id}` | `UserDTO` або `ResultDTO` з `item` |
-| Створити | `POST /api/users` | створений `UserDTO` (з `userPK`) |
-| Змінити | `PUT /api/users/{id}` | `UserDTO` |
-| Видалити | `DELETE /api/users/{id}` | 204 |
+| Вхід | `POST /api/auth/login` `{email, password}` | `{token}`; 401 ProblemDetails; 429 від rate limiter |
+| Список | `GET /api/users?currentPage&pageSize&sortExpression&searchValue&searchByUserName&searchByEmail&searchByFirstName&searchBySecondName&includeInactive&strictMatch` | `{items:[UserDTO], totalRows}` |
+| Один | `GET /api/users/{guid}` | `UserDTO` |
+| Створити | `POST /api/users` (без userPK) | 201 + `UserDTO` |
+| Змінити | `PUT /api/users` (userPK у тілі) | 204 |
+| Видалити | `DELETE /api/users/{guid}` | 204 |
 
-`UserDTO` (camelCase): `userPK, userName, email, password, activeStatus, roleTypePK, firstName, secondName, birthDate`.
-`sortExpression` має вигляд `UserName asc` / `BirthDate desc` (відповідність колонок - у `user_list.js`, `sortFields`).
-У режимі edit порожній пароль не надсилається.
-Права (Administrator бачить усіх, User - лише звичайних) забезпечує бекенд; UI лише ховає Add/Edit/Delete не-адмінам.
+JSON у camelCase: `userPK` (Guid), `userName`, `email`, `password`, `activeStatus`, `roleTypePK`, `firstName`, `secondName`, `birthDate`.
+`sortExpression` має вигляд `UserName asc` (відповідність колонок - `sortFields` у `user_list.js`).
+У режимі edit порожній пароль не надсилається. Ролі (`config.js`) приведіть до значень RoleTypes.
 
 ## Режими й роутинг (Sammy)
 
